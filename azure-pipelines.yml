@@ -1,0 +1,20 @@
+trigger: none
+
+stages:
+  - stage: sastScanSonar
+    pool:
+     vmImage: ubuntu-latest
+    jobs:
+      - job: sonar
+        steps:
+        - checkout: self
+          fetchDepth: 0
+        - task: SonarCloudPrepare@3
+          inputs:
+            SonarQube: 'sonar-fire'
+            organization: 'achintadutta04'
+            scannerMode: 'cli'
+            configMode: 'manual'
+            cliProjectKey: 'achintadutta04_app-pipeline'
+            cliProjectName: 'app-pipeline'
+            cliSources: '.'
