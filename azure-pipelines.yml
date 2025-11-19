@@ -18,3 +18,9 @@ stages:
             cliProjectKey: 'achintadutta04_app-pipeline'
             cliProjectName: 'app-pipeline'
             cliSources: '.'
+        - task: SonarQubeAnalyze@7
+          inputs:
+            jdkversion: 'JAVA_HOME_17_X64'
+        - task: SonarCloudPublish@3
+          inputs:
+            pollingTimeoutSec: '300'
