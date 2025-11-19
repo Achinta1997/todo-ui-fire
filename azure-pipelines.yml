@@ -66,5 +66,11 @@ stages:
             sshEndpoint: 'fire-vm'
             sourceFolder: '$(Build.ArtifactStagingDirectory)'
             contents: '**'
-            targetFolder: '/var/www/html'
+            targetFolder: '/home/tondu'
+            readyTimeout: '20000'
+        - task: SSH@0
+          inputs:
+            sshEndpoint: 'fire-vm'
+            runOptions: 'commands'
+            commands: 'sudo cp -r /home/tondu/* /var/www/html'
             readyTimeout: '20000'
