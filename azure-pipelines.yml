@@ -24,3 +24,47 @@ stages:
         - task: SonarCloudPublish@3
           inputs:
             pollingTimeoutSec: '300'
+
+  - stage: buildAndPush
+    pool:
+      vmImage: ubuntu-latest
+    jobs:
+      - job: buildAndPush
+        steps:
+        - task: Npm@1
+          inputs:
+            command: 'install'
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run build'
+        - task: UniversalPackages@0
+          inputs:
+            command: 'publish'
+            publishDirectory: '$(System.DefaultWorkingDirectory)/build'
+            feedsToUsePublish: 'internal'
+            vstsFeedPublish: 'a7ddfc6d-3498-4ec3-94bf-db09610f3c2a/48b8580e-3844-42ab-9afc-7cb157c57469'
+            vstsFeedPackagePublish: 'todo'
+            versionOption: 'custom'
+            versionPublish: '1.0.0'
+
+  - stage: release
+    pool: fire
+    jobs:
+      - job: downloadAndDeploy
+        steps:
+        - task: UniversalPackages@0
+          inputs:
+            command: 'download'
+            downloadDirectory: '$(Build.ArtifactStagingDirectory)'
+            feedsToUse: 'internal'
+            vstsFeed: 'a7ddfc6d-3498-4ec3-94bf-db09610f3c2a/48b8580e-3844-42ab-9afc-7cb157c57469'
+            vstsFeedPackage: 'todo'
+            vstsPackageVersion: '1.0.0'
+        - task: CopyFilesOverSSH@0
+          inputs:
+            sshEndpoint: 'fire-vm'
+            sourceFolder: '$(Build.ArtifactStagingDirectory)'
+            contents: '**'
+            targetFolder: '/var/www/html'
+            readyTimeout: '20000'
